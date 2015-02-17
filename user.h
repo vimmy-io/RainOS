@@ -37,3 +37,11 @@ void* memset(void*, int, uint);
 void* malloc(uint);
 void free(void*);
 int atoi(const char*);
+
+//EXOKERNEL DEFS
+
+#define nullptr 0
+
+//Memory
+char* getva(void);
+char* getframe(int);

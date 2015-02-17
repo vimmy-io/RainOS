@@ -25,8 +25,8 @@ struct {
   struct run *freelist;
 } kmem;
 
-//eight byte aligned
-//since 1 page => 4096bytes => 512 entries
+//16 byte aligned
+//since 1 page => 4096bytes => 256 entries
 struct framelist {
 	int pid;
 	char *frame;
@@ -39,7 +39,9 @@ struct framelist start;
 //number of frames allocated
 int frames = 0;
 
-char* allocadd(int);
+#ifdef LOCAL_DEBUG
+	char* allocadd(int);
+#endif
 
 void
 initframes()
@@ -202,4 +204,8 @@ allocadd(int pid)
   return (char*)r;
 }
 
+struct run *getfreelist(void)
+{
+	return kmem.freelist;
+}
 
