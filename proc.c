@@ -193,7 +193,7 @@ exit(void)
   end_op();
   proc->cwd = 0;
 
-  acquire(&ptable.lock);
+   acquire(&ptable.lock);
 
   // Parent might be sleeping in wait().
   wakeup1(proc->parent);

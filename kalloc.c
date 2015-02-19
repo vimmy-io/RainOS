@@ -157,51 +157,118 @@ kalloc(void)
   return (char*)r;
 }
 
-//Allocate a page and add it to the allocated pages list
-char*
-allocadd(int pid)
+//Allocate a frame and add it to the allocated pages list
+int
+allocadd(int pid, char *frame)
 {
-  struct run *r;
-  struct framelist *f, *new_slot;
+	struct framelist *f, *new_slot;
+	struct run *freelist;
+	int found = 0;
 
-  if(kmem.use_lock)
-    acquire(&kmem.lock);
-  r = kmem.freelist;
-  if(r)
-    kmem.freelist = r->next;
-  if(kmem.use_lock)
-    release(&kmem.lock);
+	if(!frame)
+		return 0;
 
-  //add the page r to the allocated frames list
+	if(!kmem.freelist)
+		return 0;
 
-  //find the next free slot
-  f = &start;
-  while(f->next != 0) f = f->next;
+	//search the frame in the free list
+	//to check it exists
+	freelist = kmem.freelist;
 
-#ifdef LOCAL_DEBUG
-  cprintf("Process PID: %d\n", pid);
-  cprintf("Free Slot: %x\n", f);
-#endif
+	while(freelist != 0)
+	{
+		if((char*)freelist == frame)
+		{
+			*freelist = *freelist->next;
+			found = 1;
+			break;
+		}
 
-  //set the frame in the list
-  f->pid = pid;
-  f->frame = (char*)r;
+		freelist = freelist->next;
+	}
 
-#ifdef LOCAL_DEBUG
-  cprintf("Free Frame: %x\n", r);
-#endif
+	if(!found)
+	{
+		cprintf("Not found!\n");
+		return 0;
+	}
 
-  new_slot = f + 1;// + sizeof(struct framelist);
-  new_slot->next = 0;
+	//add the page r to the allocated frames list
 
-#ifdef LOCAL_DEBUG
-  cprintf("New Slot: %x\n", new_slot);
-  cprintf("New Slot Next: %x\n\n", new_slot->next);
-#endif
+	//find the next free slot
+	f = &start;
+	while(f->next != 0) f = f->next;
 
-  f->next = new_slot;
+	#ifdef LOCAL_DEBUG
+	cprintf("Process PID: %d\n", pid);
+	cprintf("Free Slot: %x\n", f);
+	#endif
 
-  return (char*)r;
+	//set the frame in the list
+	f->pid = pid;
+	f->frame = frame;
+
+	#ifdef LOCAL_DEBUG
+	cprintf("Free Frame: %x\n", r);
+	#endif
+
+	new_slot = f + 1;// + sizeof(struct framelist);
+	new_slot->next = 0;
+
+	#ifdef LOCAL_DEBUG
+	cprintf("New Slot: %x\n", new_slot);
+	cprintf("New Slot Next: %x\n\n", new_slot->next);
+	#endif
+
+	f->next = new_slot;
+
+	return 1;
+
+//  struct run *r;
+//  struct framelist *f, *new_slot;
+//
+//  if(kmem.use_lock)
+//    acquire(&kmem.lock);
+//  r = kmem.freelist;
+//  if(r)
+//    kmem.freelist = r->next;
+//  if(kmem.use_lock)
+//    release(&kmem.lock);
+//
+//  if(!r)
+//	  return 0;
+//
+//  //add the page r to the allocated frames list
+//
+//  //find the next free slot
+//  f = &start;
+//  while(f->next != 0) f = f->next;
+//
+//#ifdef LOCAL_DEBUG
+//  cprintf("Process PID: %d\n", pid);
+//  cprintf("Free Slot: %x\n", f);
+//#endif
+//
+//  //set the frame in the list
+//  f->pid = pid;
+//  f->frame = (char*)r;
+//
+//#ifdef LOCAL_DEBUG
+//  cprintf("Free Frame: %x\n", r);
+//#endif
+//
+//  new_slot = f + 1;// + sizeof(struct framelist);
+//  new_slot->next = 0;
+//
+//#ifdef LOCAL_DEBUG
+//  cprintf("New Slot: %x\n", new_slot);
+//  cprintf("New Slot Next: %x\n\n", new_slot->next);
+//#endif
+//
+//  f->next = new_slot;
+//
+//  return (char*)r;
+
 }
 
 struct run *getfreelist(void)

@@ -45,3 +45,6 @@ int atoi(const char*);
 //Memory
 char* getva(void);
 char* getframe(int);
+char* getpde(uint);
+char* getpte(uint);
+int   addpage(char *va, char *frame);
