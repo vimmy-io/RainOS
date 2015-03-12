@@ -22,8 +22,8 @@
 #define SYS_close  21
 
 //EXOKERNEL CALLS
-#define SYS_getva		22
-#define SYS_getframe 	23
-#define SYS_getpde		24
-#define SYS_getpte		25
-#define SYS_addpage		26
+#define SYS_ExGetVA			22
+#define SYS_ExGetFrame	 	23
+#define SYS_ExGetPDE		24
+#define SYS_ExGetPTE		25
+#define SYS_ExAddPage			26

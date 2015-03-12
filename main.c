@@ -17,11 +17,14 @@ extern char end[]; // first address after kernel loaded from ELF file
 int
 main(void)
 {
+  cprintf("Kernel Setup at: %x\n", end);
   kinit1(end, P2V(4*1024*1024)); // phys page allocator
   kvmalloc();      // kernel page table
   mpinit();        // collect info about this machine
   lapicinit();
   seginit();       // set up segments
+
+  cprintf("Kernel Setup at: %x\n", v2p(end));
   cprintf("\ncpu%d: starting xv6\n\n", cpu->id);
 
   initframes();

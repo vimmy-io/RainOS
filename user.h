@@ -43,8 +43,8 @@ int atoi(const char*);
 #define nullptr 0
 
 //Memory
-char* getva(void);
-char* getframe(int);
-char* getpde(uint);
-char* getpte(uint);
-int   addpage(char *va, char *frame);
+char* ExGetVA(void);
+char* ExGetFrame(int);
+char* ExGetPDE(uint);
+char* ExGetPTE(uint);
+int   ExAddPage(char *va, char *frame);

@@ -98,11 +98,12 @@ extern int sys_unlink(void);
 extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
-extern int sys_getframe(void);
-extern int sys_getva(void);
-extern int sys_getpde(void);
-extern int sys_getpte(void);
-extern int sys_addpage(void);
+
+extern int sys_ExGetFrame(void);
+extern int sys_ExGetVA(void);
+extern int sys_ExGetPDE(void);
+extern int sys_ExGetPTE(void);
+extern int sys_ExAddPage(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -126,11 +127,11 @@ static int (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
-[SYS_getva]	  sys_getva,
-[SYS_getframe]sys_getframe,
-[SYS_getpde]  sys_getpde,
-[SYS_getpte]  sys_getpte,
-[SYS_addpage] sys_addpage,
+[SYS_ExGetVA]	  sys_ExGetVA,
+[SYS_ExGetFrame]sys_ExGetFrame,
+[SYS_ExGetPDE]  sys_ExGetPDE,
+[SYS_ExGetPTE]  sys_ExGetPTE,
+[SYS_ExAddPage] sys_ExAddPage,
 };
 
 void
