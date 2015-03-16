@@ -2,6 +2,7 @@
 #include "stat.h"
 #include "user.h"
 #include "mmu.h"
+#include "elf.h"
 
 #define PHYADDR(va, pte)	(((uint)(va) & 0xFFF) & ((uint)(pte) & ~0xFFF))
 
@@ -124,14 +125,49 @@ void AllocTest()
 	printf(1, "END\n");
 }
 
+void FSTest()
+{
+	//int fd;
+	char* file = "primer";
+	//struct elfhdr elf;
+	//int n;
+
+	//int time = uptime();
+	ExFileRead(file);
+
+//	fd = open(file, 0);
+//
+//	if((n = read(fd, &elf, sizeof(elf))) < 0)
+//	{
+//		printf(1, "Bytes not read!!\n");
+//		return;
+//	}
+//
+//	if(elf.magic != ELF_MAGIC)
+//	{
+//		printf(1, "Elf not Magic!!\n");
+//		return;
+//	}
+//	else
+//	{
+//		printf(1, "Read: %d  Actual: %d\n", elf.magic, ELF_MAGIC);
+//	}
+//
+//	printf(1, "Time Taken: %d\n", uptime() - time);
+}
+
 int
 main(int argc, char *argv[])
 {
+	ExRegister();
+
 	//VATest();
 	//FrameTest();
 	//PageTableTest();
 
-	AllocTest();
+	//AllocTest();
+
+	FSTest();
 
   exit();
 }

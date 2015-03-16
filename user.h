@@ -48,3 +48,8 @@ char* ExGetFrame(int);
 char* ExGetPDE(uint);
 char* ExGetPTE(uint);
 int   ExAddPage(char *va, char *frame);
+int	  ExRegister();
+
+//FS
+char* ExFileRead(char*);
+//int ExFileRead(void);

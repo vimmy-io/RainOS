@@ -164,6 +164,12 @@ static inline uint8 inb(uint16 port)
 
 #define DMA_AUTOINIT		0x10
 
+//DMA Transfer modes
+#define DMA_MODE_TRANSFER_ON_DEMAND		0
+#define DMA_MODE_TRANSFER_SINGLE		0x40
+#define DMA_MODE_TRANSFER_BLOCK			0x80
+#define DMA_MODE_TRANSFER_CASCADE		0xC0
+
 
 #ifdef CONFIG_ISA_DMA_API
 extern spinlock_t  dma_spin_lock;
@@ -180,6 +186,15 @@ static inline void release_dma_lock(unsigned long flags)
 	spin_unlock_irqrestore(&dma_spin_lock, flags);
 }
 #endif /* CONFIG_ISA_DMA_API */
+
+//reset dma
+static inline void reset_dma(unsigned int dmanr)
+{
+	if(dmanr == 1)
+		dma_outb(255, DMA1_RESET_REG);
+	else
+		dma_outb(255, DMA2_RESET_REG);
+}
 
 /* enable/disable a specific DMA channel */
 static inline void enable_dma(unsigned int dmanr)

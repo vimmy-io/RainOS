@@ -10,7 +10,14 @@ struct run {
 };
 
 int
-sys_getframe(void)
+sys_ExRegister(void)
+{
+	proc->type = 1;
+	return 0;
+}
+
+int
+sys_ExGetFrame(void)
 {
 	int num_frames;
 	int num = 0;
@@ -41,13 +48,13 @@ sys_getframe(void)
 }
 
 int
-sys_getva(void)
+sys_ExGetVA(void)
 {
 	return PGROUNDUP(proc->sz);
 }
 
 int
-sys_getpde(void)
+sys_ExGetPDE(void)
 {
 	int index;
 
@@ -100,7 +107,7 @@ pte_t * getpgtab(pde_t *pgdir, const void *va, int alloc)
 }
 
 int
-sys_getpte(void)
+sys_ExGetPTE(void)
 {
 	int va;
 
@@ -111,7 +118,7 @@ sys_getpte(void)
 }
 
 int
-sys_addpage(void)
+sys_ExAddPage(void)
 {
 	int va, frame;
 	pte_t *pgtab = 0;

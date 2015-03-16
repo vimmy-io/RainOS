@@ -20,6 +20,7 @@ void            consoleinit(void);
 void            cprintf(char*, ...);
 void            consoleintr(int(*)(void));
 void            panic(char*) __attribute__((noreturn));
+void			consputc(int c);
 
 // exec.c
 int             exec(char*, char**);
@@ -52,10 +53,13 @@ int             readi(struct inode*, char*, uint, uint);
 void            stati(struct inode*, struct stat*);
 int             writei(struct inode*, char*, uint, uint);
 
+int				readfile(struct inode*, char*, uint);
+
 // ide.c
 void            ideinit(void);
 void            ideintr(void);
 void            iderw(struct buf*);
+void			ideread(uint sector, uint device);
 
 // ioapic.c
 void            ioapicenable(int irq, int cpu);
@@ -86,6 +90,9 @@ void            initlog(void);
 void            log_write(struct buf*);
 void            begin_op();
 void            end_op();
+
+//main.c
+char*			kernelend();
 
 // mp.c
 extern int      ismp;
@@ -180,6 +187,7 @@ void            switchkvm(void);
 int             copyout(pde_t*, uint, void*, uint);
 void            clearpteu(pde_t *pgdir, char *uva);
 //static pte_t*	walkpgdir(pde_t *pgdir, const void *va, int alloc);
+int mappages(pde_t *pgdir, void *va, uint size, uint pa, int perm);
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))

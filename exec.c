@@ -18,6 +18,8 @@ exec(char *path, char **argv)
   struct proghdr ph;
   pde_t *pgdir, *oldpgdir;
 
+  //cprintf("Path: %s\n", path);
+
   begin_op();
   if((ip = namei(path)) == 0){
     end_op();
@@ -93,6 +95,7 @@ exec(char *path, char **argv)
   proc->sz = sz;
   proc->tf->eip = elf.entry;  // main
   proc->tf->esp = sp;
+  proc->type = 0;	//process is monolithic by default
   switchuvm(proc);
   freevm(oldpgdir);
   return 0;

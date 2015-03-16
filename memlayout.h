@@ -4,7 +4,7 @@
 #define PHYSTOP 0xE000000           // Top physical memory 224 MB
 #define DEVSPACE 0xFE000000         // Other devices are at high addresses (4096 MB)
 
-#define FOURMEG 0x400000	        // 4MB limitation where the kernel ends (supposedly)
+#define FOURMEG 0x400000	        // 4MB limitation where the kernel ends
 
 // Key addresses for address space layout (see kmap in vm.c for layout)
 #define KERNBASE 0x80000000         // First kernel virtual address (2048 MB) Not-Original: 3FE800

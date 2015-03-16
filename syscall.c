@@ -104,6 +104,8 @@ extern int sys_ExGetVA(void);
 extern int sys_ExGetPDE(void);
 extern int sys_ExGetPTE(void);
 extern int sys_ExAddPage(void);
+extern int sys_ExFileRead(void);
+extern int sys_ExRegister(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -132,6 +134,8 @@ static int (*syscalls[])(void) = {
 [SYS_ExGetPDE]  sys_ExGetPDE,
 [SYS_ExGetPTE]  sys_ExGetPTE,
 [SYS_ExAddPage] sys_ExAddPage,
+[SYS_ExFileRead] sys_ExFileRead,
+[SYS_ExRegister] sys_ExRegister,
 };
 
 void

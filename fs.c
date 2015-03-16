@@ -5,7 +5,7 @@
 //   + Directories: inode with special contents (list of other inodes!)
 //   + Names: paths like /usr/rtm/xv6/fs.c for convenient naming.
 //
-// This file contains the low-level file system manipulation 
+// This file contains the low-level file system manipulation
 // routines.  The (higher-level) system call implementations
 // are in sysfile.c.
 
@@ -28,7 +28,7 @@ void
 readsb(int dev, struct superblock *sb)
 {
   struct buf *bp;
-  
+
   bp = bread(dev, 1);
   memmove(sb, bp->data, sizeof(*sb));
   brelse(bp);
@@ -39,14 +39,14 @@ static void
 bzero(int dev, int bno)
 {
   struct buf *bp;
-  
+
   bp = bread(dev, bno);
   memset(bp->data, 0, BSIZE);
   log_write(bp);
   brelse(bp);
 }
 
-// Blocks. 
+// Blocks.
 
 // Allocate a zeroed disk block.
 static uint
@@ -305,6 +305,7 @@ iunlock(struct inode *ip)
 
   acquire(&icache.lock);
   ip->flags &= ~I_BUSY;
+  ip->flags &= ~I_VALID;
   wakeup(ip);
   release(&icache.lock);
 }
@@ -350,7 +351,7 @@ iunlockput(struct inode *ip)
 //
 // The content (data) associated with each inode is stored
 // in blocks on the disk. The first NDIRECT block numbers
-// are listed in ip->addrs[].  The next NINDIRECT blocks are 
+// are listed in ip->addrs[].  The next NINDIRECT blocks are
 // listed in block ip->addrs[NDIRECT].
 
 // Return the disk block address of the nth block in inode ip.
@@ -403,7 +404,7 @@ itrunc(struct inode *ip)
       ip->addrs[i] = 0;
     }
   }
-  
+
   if(ip->addrs[NDIRECT]){
     bp = bread(ip->dev, ip->addrs[NDIRECT]);
     a = (uint*)bp->data;
@@ -450,11 +451,36 @@ readi(struct inode *ip, char *dst, uint off, uint n)
   if(off + n > ip->size)
     n = ip->size - off;
 
+  //cprintf("Inode: %d  Size of file: %d\n", ip->inum, ip->size);
+
   for(tot=0; tot<n; tot+=m, off+=m, dst+=m){
     bp = bread(ip->dev, bmap(ip, off/BSIZE));
     m = min(n - tot, BSIZE - off%BSIZE);
     memmove(dst, bp->data + off%BSIZE, m);
     brelse(bp);
+  }
+  return n;
+}
+
+//read whole file into a buffer
+int
+readfile(struct inode *ip, char *dst, uint size)
+{
+  uint tot, m;;
+  uint n = size;//ip->size;
+  uint off = 0;
+
+  if(ip->type == T_DEV){
+    if(ip->major < 0 || ip->major >= NDEV || !devsw[ip->major].read)
+      return -1;
+    return devsw[ip->major].read(ip, dst, n);
+  }
+
+  for(tot=0; tot<n; tot+=m, off+=m, dst+=m){
+    ideread(bmap(ip, off/BSIZE), ip->dev);
+    //need to wait for the request to finish
+    m = min(n - tot, BSIZE - off%BSIZE);
+    //memmove(dst, dst + off%BSIZE, m);
   }
   return n;
 }
@@ -556,7 +582,7 @@ dirlink(struct inode *dp, char *name, uint inum)
   de.inum = inum;
   if(writei(dp, (char*)&de, off, sizeof(de)) != sizeof(de))
     panic("dirlink");
-  
+
   return 0;
 }
 

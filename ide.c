@@ -35,7 +35,7 @@ idewait(int checkerr)
 {
   int r;
 
-  while(((r = inb(0x1f7)) & (IDE_BSY|IDE_DRDY)) != IDE_DRDY) 
+  while(((r = inb(0x1f7)) & (IDE_BSY|IDE_DRDY)) != IDE_DRDY)
     ;
   if(checkerr && (r & (IDE_DF|IDE_ERR)) != 0)
     return -1;
@@ -51,7 +51,7 @@ ideinit(void)
   picenable(IRQ_IDE);
   ioapicenable(IRQ_IDE, ncpu - 1);
   idewait(0);
-  
+
   // Check if disk 1 is present
   outb(0x1f6, 0xe0 | (1<<4));
   for(i=0; i<1000; i++){
@@ -60,7 +60,7 @@ ideinit(void)
       break;
     }
   }
-  
+
   // Switch back to disk 0.
   outb(0x1f6, 0xe0 | (0<<4));
 }
@@ -87,17 +87,44 @@ idestart(struct buf *b)
   }
 }
 
+//function to read, no buffer, no queues
+void
+ideread(uint sector, uint device)
+{
+	idewait(0);
+	outb(0x3f6, 0);  // generate interrupt
+	outb(0x1f2, 1);  // number of sectors
+	outb(0x1f3, sector & 0xff);
+	outb(0x1f4, (sector >> 8) & 0xff);
+	outb(0x1f5, (sector >> 16) & 0xff);
+	outb(0x1f6, 0xe0 | ((device&1)<<4) | ((sector>>24)&0x0f));
+	outb(0x1f7, IDE_CMD_READ);
+	cprintf("IDE READ\n");
+}
+
 // Interrupt handler.
 void
 ideintr(void)
 {
   struct buf *b;
 
-  // First queued buffer is the active request.
+   // First queued buffer is the active request.
   acquire(&idelock);
   if((b = idequeue) == 0){
     release(&idelock);
+    cprintf("Data transferred %d!!\n", proc->type);
     // cprintf("spurious IDE interrupt\n");
+    if(proc->type == 1)
+    {
+    	idewait(1);
+    	int i = 0;
+    	insl(0x1f0, (void*)16384, 512/4);
+    	char *arr = (char*)16384;
+    	for(i = 0; i < 2; i++)
+    	{
+    		consputc(arr[i]);
+    	}
+    }
     return;
   }
   idequeue = b->qnext;
@@ -105,12 +132,14 @@ ideintr(void)
   // Read data if needed.
   if(!(b->flags & B_DIRTY) && idewait(1) >= 0)
     insl(0x1f0, b->data, 512/4);
-  
+
+  //cprintf("Data transferred 2!!\n");
+
   // Wake process waiting for this buf.
   b->flags |= B_VALID;
   b->flags &= ~B_DIRTY;
   wakeup(b);
-  
+
   // Start disk on next buf in queue.
   if(idequeue != 0)
     idestart(idequeue);
@@ -119,7 +148,7 @@ ideintr(void)
 }
 
 //PAGEBREAK!
-// Sync buf with disk. 
+// Sync buf with disk.
 // If B_DIRTY is set, write buf to disk, clear B_DIRTY, set B_VALID.
 // Else if B_VALID is not set, read buf from disk, set B_VALID.
 void
@@ -141,11 +170,11 @@ iderw(struct buf *b)
   for(pp=&idequeue; *pp; pp=&(*pp)->qnext)  //DOC:insert-queue
     ;
   *pp = b;
-  
+
   // Start disk if necessary.
   if(idequeue == b)
     idestart(b);
-  
+
   // Wait for request to finish.
   while((b->flags & (B_VALID|B_DIRTY)) != B_VALID){
     sleep(b, &idelock);

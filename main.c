@@ -48,6 +48,11 @@ main(void)
   mpmain();
 }
 
+char* kernelend()
+{
+	return end;
+}
+
 // Other CPUs jump here from entryother.S.
 static void
 mpenter(void)

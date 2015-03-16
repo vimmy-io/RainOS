@@ -22,6 +22,7 @@ OBJS = \
 	sysfile.o\
 	sysproc.o\
 	sysmem.o\
+	sysfs.o\
 	timer.o\
 	trapasm.o\
 	trap.o\
@@ -174,6 +175,7 @@ UPROGS=\
 	_wc\
 	_zombie\
 	_app\
+	primer\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
