@@ -26,4 +26,6 @@
 #define SYS_ExGetFrame	 	23
 #define SYS_ExGetPDE		24
 #define SYS_ExGetPTE		25
-#define SYS_ExAddPage			26
+#define SYS_ExAddPage		26
+#define SYS_ExFileRead		27
+#define SYS_ExRegister		28
