@@ -60,6 +60,8 @@ void            ideinit(void);
 void            ideintr(void);
 void            iderw(struct buf*);
 void			ideread(uint sector, uint device);
+void			ExIdeIntr(void);
+void			SetExProcess(void);
 
 // ioapic.c
 void            ioapicenable(int irq, int cpu);

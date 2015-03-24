@@ -13,6 +13,8 @@ int
 sys_ExRegister(void)
 {
 	proc->type = 1;
+
+	SetExProcess();
 	return 0;
 }
 

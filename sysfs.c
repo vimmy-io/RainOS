@@ -68,17 +68,24 @@ sys_ExFileRead(void)
 
 
 	uint add = PGROUNDDOWN((uint)proc->sz);
+	cprintf("Add: %d\n", add);
 	mappages(proc->pgdir, (void*)add, DMA_TRANSFER, FOURMEG, PTE_U | PTE_W | PTE_P);
 
 	//readfile(ip, (char*)add, DMA_TRANSFER);
 
+	ilock(ip);
+	readi(ip, (char*)add, 0, DMA_TRANSFER);
+
+	iunlock(ip);
+
+#define TESTS	15
 #define MONO
 #ifdef MONO
 	uint start_time, time_taken, average_time = 0;
 	int i = 0;
-	for(i = 0; i < 25; i++)
+	for(i = 0; i < TESTS; i++)
 	{
-		SetDMA();
+		//SetDMA();
 
 		start_time = ticks;
 
@@ -95,8 +102,9 @@ sys_ExFileRead(void)
 
 	cprintf("Average Time DMA: %d\n", average_time);
 
-	for(i = 0; i < 25; i++)
+	for(i = 0; i < TESTS; i++)
 	{
+		SetDMA();
 		start_time = ticks;
 
 		ilock(ip);
@@ -121,8 +129,8 @@ sys_ExFileRead(void)
 //	{
 //		consputc(contents[i]);
 //	}
-
-	cprintf("\n");
+//
+//	cprintf("\n");
 
 	return 0;
 }

@@ -28,6 +28,12 @@ static struct buf *idequeue;
 
 static int havedisk1;
 static void idestart(struct buf*);
+static int ExProcess;
+
+void SetExProcess()
+{
+	ExProcess = 1;
+}
 
 // Wait for IDE disk to become ready.
 static int
