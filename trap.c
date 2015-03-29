@@ -14,6 +14,13 @@ extern uint vectors[];  // in vectors.S: array of 256 entry pointers
 struct spinlock tickslock;
 uint ticks;
 
+static int ExProcess;
+
+void SetExProcess()
+{
+	ExProcess = 1;
+}
+
 void
 tvinit(void)
 {
@@ -57,7 +64,7 @@ trap(struct trapframe *tf)
     lapiceoi();
     break;
   case T_IRQ0 + IRQ_IDE:
-  	ideintr();
+   	ideintr();
     lapiceoi();
     break;
   case T_IRQ0 + IRQ_IDE+1:

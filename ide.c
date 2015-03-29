@@ -28,12 +28,6 @@ static struct buf *idequeue;
 
 static int havedisk1;
 static void idestart(struct buf*);
-static int ExProcess;
-
-void SetExProcess()
-{
-	ExProcess = 1;
-}
 
 // Wait for IDE disk to become ready.
 static int
@@ -93,45 +87,22 @@ idestart(struct buf *b)
   }
 }
 
-//function to read, no buffer, no queues
-void
-ideread(uint sector, uint device)
-{
-	idewait(0);
-	outb(0x3f6, 0);  // generate interrupt
-	outb(0x1f2, 1);  // number of sectors
-	outb(0x1f3, sector & 0xff);
-	outb(0x1f4, (sector >> 8) & 0xff);
-	outb(0x1f5, (sector >> 16) & 0xff);
-	outb(0x1f6, 0xe0 | ((device&1)<<4) | ((sector>>24)&0x0f));
-	outb(0x1f7, IDE_CMD_READ);
-	cprintf("IDE READ\n");
-}
-
 // Interrupt handler.
 void
 ideintr(void)
 {
   struct buf *b;
 
-   // First queued buffer is the active request.
+  // First queued buffer is the active request.
   acquire(&idelock);
   if((b = idequeue) == 0){
     release(&idelock);
-    cprintf("Data transferred %d!!\n", proc->type);
-    // cprintf("spurious IDE interrupt\n");
+
     if(proc->type == 1)
-    {
-    	idewait(1);
-    	int i = 0;
-    	insl(0x1f0, (void*)16384, 512/4);
-    	char *arr = (char*)16384;
-    	for(i = 0; i < 2; i++)
-    	{
-    		consputc(arr[i]);
-    	}
-    }
-    return;
+     {
+   	  ex_ideintr();
+   	  return;
+     }
   }
   idequeue = b->qnext;
 

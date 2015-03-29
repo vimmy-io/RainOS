@@ -1,3 +1,6 @@
+#ifndef USER_H
+#define USER_H
+
 struct stat;
 struct rtcdate;
 
@@ -50,6 +53,14 @@ char* ExGetPTE(uint);
 int   ExAddPage(char *va, char *frame);
 int	  ExRegister();
 
+typedef void (*function_ptr)(void);
+
 //FS
-char* ExFileRead(char*);
+char* ExFileRead(char*, char*);
+void  ExReadSector(uint sector, uint device, char* location);//void (*upcall)());
 //int ExFileRead(void);
+
+void ExResetTransferCount();
+uint ExGetTransferCount();
+
+#endif

@@ -29,3 +29,6 @@
 #define SYS_ExAddPage		26
 #define SYS_ExFileRead		27
 #define SYS_ExRegister		28
+#define SYS_ExReadSector	29
+#define SYS_ExResetTransferCount	30
+#define SYS_ExGetTransferCount		31

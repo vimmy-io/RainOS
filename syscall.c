@@ -106,6 +106,9 @@ extern int sys_ExGetPTE(void);
 extern int sys_ExAddPage(void);
 extern int sys_ExFileRead(void);
 extern int sys_ExRegister(void);
+extern int sys_ExReadSector(void);
+extern int sys_ExResetTransferCount(void);
+extern int sys_ExGetTransferCount(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -136,6 +139,9 @@ static int (*syscalls[])(void) = {
 [SYS_ExAddPage] sys_ExAddPage,
 [SYS_ExFileRead] sys_ExFileRead,
 [SYS_ExRegister] sys_ExRegister,
+[SYS_ExReadSector] sys_ExReadSector,
+[SYS_ExResetTransferCount] sys_ExResetTransferCount,
+[SYS_ExGetTransferCount] sys_ExGetTransferCount,
 };
 
 void

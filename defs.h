@@ -1,3 +1,6 @@
+#ifndef DEFS_H
+#define DEFS_H
+
 struct buf;
 struct context;
 struct file;
@@ -54,6 +57,7 @@ void            stati(struct inode*, struct stat*);
 int             writei(struct inode*, char*, uint, uint);
 
 int				readfile(struct inode*, char*, uint);
+uint			ex_bmap(struct inode *ip, uint bn);
 
 // ide.c
 void            ideinit(void);
@@ -61,7 +65,16 @@ void            ideintr(void);
 void            iderw(struct buf*);
 void			ideread(uint sector, uint device);
 void			ExIdeIntr(void);
+
 void			SetExProcess(void);
+void			SetUpcall(void *function);
+
+//ex_ide.c
+void			ResetTransferCount(void);
+uint			GetTransferCount(void);
+void			ex_addbuffer(uint sector, uint device, char *location);
+void			ex_ideintr(void);
+void			ProcessBuffer(void);
 
 // ioapic.c
 void            ioapicenable(int irq, int cpu);
@@ -203,3 +216,5 @@ struct run;
 
 struct run* getfreelist(void);
 int	allocadd(int, char*);	//char* allocadd(int); originally
+
+#endif

@@ -4,6 +4,8 @@
 #include "mmu.h"
 #include "elf.h"
 
+//#include "ex_fs.h"
+
 #define PHYADDR(va, pte)	(((uint)(va) & 0xFFF) & ((uint)(pte) & ~0xFFF))
 
 void VATest()
@@ -128,12 +130,12 @@ void AllocTest()
 void FSTest()
 {
 	//int fd;
-	char* file = "primer";
+		//char* file = "primer";	//uncomment to work
 	//struct elfhdr elf;
 	//int n;
 
 	//int time = uptime();
-	ExFileRead(file);
+		//ExFileRead(file);	//uncomment to work
 
 //	fd = open(file, 0);
 //
@@ -156,6 +158,11 @@ void FSTest()
 //	printf(1, "Time Taken: %d\n", uptime() - time);
 }
 
+void DealWithIt()
+{
+	printf(1, "Dealt with it!!\n");
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -167,7 +174,43 @@ main(int argc, char *argv[])
 
 	//AllocTest();
 
-	FSTest();
+	//FSTest();
+
+	//function_ptr call;
+	//call = DealWithIt;
+
+	//(*call)();
+
+	//printf(1, "Call: %x\n", call);
+
+	//ExReadSector(22, 0, 0);
+	//char *loc = 0;
+	//loc = malloc(64000);
+
+	//if(!loc)
+		//printf(1, "Malloc failed!!\n");
+
+	ExResetTransferCount();
+
+	ExFileRead("BabyTux.bmp", 0);	//last argument shoudl be loc
+
+	printf(1, "Passed ExFile Read!!\n");
+
+	ExReadSector(0, 0, 0);
+
+	printf(1, "Passed ExReadSector!!\n");
+
+//	uint prevCount = 0;
+//	prevCount = ExGetTransferCount();
+//
+//	while(1)
+//	{
+//		if(prevCount != ExGetTransferCount())
+//		{
+//			printf(1, "\n\n =====================COUNT CHANGED ==========================================\n\n");
+//			prevCount = ExGetTransferCount();
+//		}
+//	}
 
   exit();
 }

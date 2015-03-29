@@ -16,6 +16,8 @@
 #define HDD_DMA_CHANNEL		3
 #define DMA_TRANSFER	60000
 
+typedef void (*function_ptr)(void);
+
 void SetDMA()
 {
 #define ENABLE_DMA
@@ -48,89 +50,92 @@ sys_ExFileRead(void)
 {
 	char *file = 0;
 	int stradd;
-	//int fd;
-	//int n;
 	struct inode *ip = 0;
-	//struct elfhdr elf;
 
 	if(argint(0, &stradd) < 0)
 	   return 0;
 
 	file = (char*)stradd;
 
-	//cprintf(file);
+	if(argint(1, &stradd) < 0)
+		   return 0;
 
-	//cprintf("\n");
+	char *location = 0;
+
+	location = (char*)stradd;
 
 	ip = namei(file);
 
-	cprintf("Inode number: %d\nType: %d\nSize: %d\n", ip->inum, ip->type, ip->size);
+	ilock(ip);
 
+	//cprintf("Device: %d, Size: %d, INum: %d: \n", ip->dev, ip->size, ip->inum);
+	//cprintf("sys_ExFileRead Cpu: %d\n", cpu->id);
 
 	uint add = PGROUNDDOWN((uint)proc->sz);
-	cprintf("Add: %d\n", add);
-	mappages(proc->pgdir, (void*)add, DMA_TRANSFER, FOURMEG, PTE_U | PTE_W | PTE_P);
+	mappages(proc->pgdir, (void*)add, 75000, FOURMEG, PTE_U | PTE_W | PTE_P);
 
-	//readfile(ip, (char*)add, DMA_TRANSFER);
+	int offset = 0;
 
-	ilock(ip);
-	readi(ip, (char*)add, 0, DMA_TRANSFER);
+	location = (char*)add;
+
+	while(offset < ip->size)
+	{
+		ex_addbuffer(ex_bmap(ip, offset / BSIZE), ip->dev, location);
+		offset += 512;
+		//cprintf("Location move\n");
+		//location = &location[512];
+		location += 512;
+		//cprintf("Location: %x\n", location);
+	}
 
 	iunlock(ip);
 
-#define TESTS	15
-#define MONO
-#ifdef MONO
-	uint start_time, time_taken, average_time = 0;
-	int i = 0;
-	for(i = 0; i < TESTS; i++)
-	{
-		//SetDMA();
+	return 0;
+}
 
-		start_time = ticks;
-
-		ilock(ip);
-
-		stradd = readi(ip, (char*)add, 0, DMA_TRANSFER);
-
-		time_taken = ticks - start_time;
-		cprintf("Time Taken: %d\n", time_taken);
-		average_time = (average_time + time_taken) / 2;
-
-		iunlock(ip);
-	}
-
-	cprintf("Average Time DMA: %d\n", average_time);
-
-	for(i = 0; i < TESTS; i++)
-	{
-		SetDMA();
-		start_time = ticks;
-
-		ilock(ip);
-
-		stradd = readi(ip, (char*)add, 0, DMA_TRANSFER);
-
-		time_taken = ticks - start_time;
-		cprintf("Time Taken: %d\n", time_taken);
-		average_time = (average_time + time_taken) / 2;
-
-		iunlock(ip);
-	}
-
-	cprintf("Average Time CPU: %d\n", average_time);
-#endif
-
-//	char *contents = (char*)add;
-//	cprintf("Contents: ");
+int sys_ExReadSector(void)
+{
+	ProcessBuffer();
+//	int sector = 0, device = 0, ilocation = 0;
+//	//char *location = 0;
 //
-//	int i = 0;
-//	for(i = 0; i < 512; i++)
-//	{
-//		consputc(contents[i]);
-//	}
+//	struct inode *ip = 0;
 //
-//	cprintf("\n");
+//	if(argint(0, &sector) < 0)
+//		return 0;
+//
+//	if(argint(1, &device) < 0)
+//		return 0;
+//
+//	if(argint(2, &ilocation) < 0)
+//		return 0;
+//
+//	ip = namei("BabyTux.bmp");
+//
+//	cprintf("Device: %d, Size: %d, INum: %d: \n", ip->dev, ip->size, ip->inum);
+//
+//	uint add = PGROUNDDOWN((uint)proc->sz);
+//	mappages(proc->pgdir, (void*)add, 512, FOURMEG, PTE_U | PTE_W | PTE_P);
+//
+//	ilock(ip);
+//	uint offset = 0;
+//	while(readi(ip, (char*)add, offset, 512) > 0) offset += 512;
+//
+//	cprintf("Offset: %d\n", offset - 512);
+//	iunlock(ip);
+
+	//location = (char*)ilocation;
 
 	return 0;
+}
+
+int sys_ExResetTransferCount(void)
+{
+	ResetTransferCount();
+	return 0;
+}
+
+int sys_ExGetTransferCount(void)
+{
+	return GetTransferCount();
 }

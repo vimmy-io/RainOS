@@ -2,6 +2,7 @@ OBJS = \
 	bio.o\
 	console.o\
 	exec.o\
+	ex_ide.o\
 	file.o\
 	fs.o\
 	ide.o\
@@ -175,7 +176,7 @@ UPROGS=\
 	_wc\
 	_zombie\
 	_app\
-	primer\
+	BabyTux.bmp\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
