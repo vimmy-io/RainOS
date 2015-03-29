@@ -162,6 +162,7 @@ void DealWithIt()
 {
 	printf(1, "Dealt with it!!\n");
 }
+void load_bmp(char *file);
 
 int
 main(int argc, char *argv[])
@@ -192,7 +193,7 @@ main(int argc, char *argv[])
 
 	ExResetTransferCount();
 
-	ExFileRead("test.txt", loc);	//last argument shoudl be loc
+	ExFileRead("BabyTux.bmp", loc);	//last argument shoudl be loc
 
 	printf(1, "Passed ExFile Read!!\n");
 
@@ -200,23 +201,150 @@ main(int argc, char *argv[])
 
 	printf(1, "Passed ExReadSector!!\nTransfers: %d\n", ExGetTransferCount());
 
-//	int i = 0;
-//	for(; i < 71680; i++)
-//	{
-//		printf(1, "%s", loc);
-//	}
-
-//	uint prevCount = 0;
-//	prevCount = ExGetTransferCount();
-//
-//	while(1)
-//	{
-//		if(prevCount != ExGetTransferCount())
-//		{
-//			printf(1, "\n\n =====================COUNT CHANGED ==========================================\n\n");
-//			prevCount = ExGetTransferCount();
-//		}
-//	}
+	load_bmp(loc);
 
   exit();
 }
+
+typedef struct tagBITMAP              /* the structure for a bitmap. */
+{
+  ushort width;
+  ushort height;
+  uchar *data;
+} BITMAP;
+
+struct FILE
+{
+	char *file;
+	uint pointer;
+};
+
+char ReadF(struct FILE *f)
+{
+	uint temp = f->pointer;
+	f->pointer++;
+	return f->file[temp];
+}
+
+void ReadSize(void *dst, struct FILE *fp, uint size)
+{
+	memmove(dst, (void*)&fp->file[fp->pointer], size);
+	fp->pointer += size;
+}
+
+void load_bmp(char *file)
+{
+  struct FILE fp;
+
+  fp.file = file;
+  fp.pointer = 0;
+
+  /* check to see if it is a valid bitmap file */
+  if (ReadF(&fp)!='B' || ReadF(&fp)!='M')
+  {
+    printf(1, "Not a valid bmp file %c %c!!\n", fp.file[0], fp.file[1]);
+    return;
+  }
+
+  /* read in the width and height of the image, and the
+     number of colors used; ignore the rest */
+  fp.pointer += 16;
+
+  BITMAP b;
+
+  ReadSize((void*)&b.width, &fp, sizeof(b.width));
+  printf(1, "Width: %d\n", b.width);
+
+  fp.pointer += 2;
+
+  ReadSize((void*)&b.height, &fp, sizeof(b.height));
+  printf(1, "Height: %d\n", b.height);
+
+  fp.pointer += 22;
+
+  ushort num_colors;
+  ReadSize((void*)&num_colors, &fp, sizeof(num_colors));
+
+  fp.pointer += 6;
+
+  /* assume we are working with an 8-bit file */
+  if (num_colors==0) num_colors=256;
+
+
+  /* try to allocate memory */
+  if ((b.data = (uchar *) malloc((ushort)(b.width * b.height))) == 0)
+  {
+    printf(1, "Error allocating memory for file\n");
+    return;
+  }
+
+  /* Ignore the palette information for now.
+     See palette.c for code to read the palette info. */
+  //fskip(fp,num_colors*4);
+  fp.pointer += num_colors * 4;
+
+  /* read the bitmap */
+  long index = 0;
+  int x = 0;
+
+  for(index = (b.height - 1) * b.width; index >= 0; index -= b.width)
+    for( x = 0; x < b.width; x++)
+      b.data[(ushort)index + x] =(uchar)ReadF(&fp);
+}
+
+//void load_bmp(char *file,BITMAP *b)
+//{
+//  FILE *fp;
+//  long index;
+//  word num_colors;
+//  int x;
+//
+//  /* open the file */
+//  if ((fp = fopen(file,"rb")) == NULL)
+//  {
+//    printf("Error opening file %s.\n",file);
+//    exit(1);
+//  }
+//
+//  /* check to see if it is a valid bitmap file */
+//  if (fgetc(fp)!='B' || fgetc(fp)!='M')
+//  {
+//    fclose(fp);
+//    printf("%s is not a bitmap file.\n",file);
+//    exit(1);
+//  }
+//
+//  /* read in the width and height of the image, and the
+//     number of colors used; ignore the rest */
+//  fskip(fp,16);
+//  fread(&b->width, sizeof(word), 1, fp);
+//  fskip(fp,2);
+//  fread(&b->height,sizeof(word), 1, fp);
+//  fskip(fp,22);
+//  fread(&num_colors,sizeof(word), 1, fp);
+//  fskip(fp,6);
+//
+//  /* assume we are working with an 8-bit file */
+//  if (num_colors==0) num_colors=256;
+//
+//
+//  /* try to allocate memory */
+//  if ((b->data = (byte *) malloc((word)(b->width*b->height))) == NULL)
+//  {
+//    fclose(fp);
+//    printf("Error allocating memory for file %s.\n",file);
+//    exit(1);
+//  }
+//
+//  /* Ignore the palette information for now.
+//     See palette.c for code to read the palette info. */
+//  fskip(fp,num_colors*4);
+//
+//  /* read the bitmap */
+//  for(index=(b->height-1)*b->width;index>=0;index-=b->width)
+//    for(x=0;x<b->width;x++)
+//      b->data[(word)index+x]=(byte)fgetc(fp);
+//
+//  fclose(fp);
+//}
+

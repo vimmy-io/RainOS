@@ -78,25 +78,11 @@ sys_ExFileRead(void)
 
 	int offset = 0;
 
-	//uint n = ip->size, tot = 0, m = 0;
-
-	//location = (char*)add;
-
-//	 for(tot=0; tot<n; tot += m, offset += m, location += m)
-//	 {
-//		 ex_addbuffer(ex_bmap(ip, offset / BSIZE), ip->dev, location);
-//		 m = min(n - tot, BSIZE - offset %BSIZE);
-//	  }
-
-	//iunlock(ip);
-
 	while(offset < ip->size)
 	{
-		//ilock(ip);
 		ex_addbuffer(bmap(ip, offset / BSIZE), ip->dev, location);
 		offset += 512;
 		location += 512;
-		//iunlock(ip);
 	}
 
 	location -= 512;
@@ -105,7 +91,6 @@ sys_ExFileRead(void)
 	offset += ip->size - offset;
 
 	ex_addbuffer(bmap(ip, offset / BSIZE), ip->dev, location);
-
 
 	iunlock(ip);
 

@@ -283,7 +283,6 @@ ilock(struct inode *ip)
   if(!(ip->flags & I_VALID)){
 	bp = bread(ip->dev, IBLOCK(ip->inum));
     dip = (struct dinode*)bp->data + ip->inum%IPB;
- //   cprintf("\n=================dip: %x===============\n", dip);
     ip->type = dip->type;
     ip->major = dip->major;
     ip->minor = dip->minor;

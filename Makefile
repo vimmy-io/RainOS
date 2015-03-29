@@ -177,7 +177,6 @@ UPROGS=\
 	_zombie\
 	_app\
 	BabyTux.bmp\
-	test.txt\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
