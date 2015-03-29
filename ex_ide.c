@@ -86,7 +86,9 @@ ideread(uint sector, uint device)
 	outb(0x1f6, 0xe0 | ((device&1)<<4) | ((sector>>24)&0x0f));
 	outb(0x1f7, IDE_CMD_READ);
 
-	cprintf("ide read end\n");	//this line needs to be here and I DON'T KNOW WHYYYY
+	idewait(1);
+
+	//cprintf("ide read end\n");	//this line needs to be here and I DON'T KNOW WHYYYY
 }
 
 void ProcessBuffer()
@@ -110,6 +112,8 @@ ex_addbuffer(uint sector, uint device, char *location)
 	temp->sector = sector;
 	temp->location = location;
 	temp->next = 0;
+
+	//cprintf("\n=================Sector: %d=================\n", sector);
 
 	acquire(&bufferlock);
 
@@ -164,6 +168,12 @@ ex_ideintr(void)
 	}
 
 	release(&bufferlock);
+
+//	int i = 0;
+//	for(; i < 512; i++)
+//	{
+//		consputc(location[i]);
+//	}
 
 	ProcessBuffer();
 }

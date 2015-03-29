@@ -57,8 +57,8 @@ typedef void (*function_ptr)(void);
 
 //FS
 char* ExFileRead(char*, char*);
-void  ExReadSector(uint sector, uint device, char* location);//void (*upcall)());
-//int ExFileRead(void);
+//void  ExReadSector(uint sector, uint device, char* location);
+void  ExReadSector(void);
 
 void ExResetTransferCount();
 uint ExGetTransferCount();

@@ -263,7 +263,7 @@ iappend(uint inum, void *xp, int n)
   off = xint(din.size);
   while(n > 0){
     fbn = off / 512;
-    //assert(fbn < MAXFILE);
+    assert(fbn < MAXFILE);
     if(fbn < NDIRECT){
       if(xint(din.addrs[fbn]) == 0){
         din.addrs[fbn] = xint(freeblock++);

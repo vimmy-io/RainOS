@@ -57,7 +57,7 @@ void            stati(struct inode*, struct stat*);
 int             writei(struct inode*, char*, uint, uint);
 
 int				readfile(struct inode*, char*, uint);
-uint			ex_bmap(struct inode *ip, uint bn);
+uint			bmap(struct inode *ip, uint bn);
 
 // ide.c
 void            ideinit(void);

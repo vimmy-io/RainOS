@@ -184,21 +184,27 @@ main(int argc, char *argv[])
 	//printf(1, "Call: %x\n", call);
 
 	//ExReadSector(22, 0, 0);
-	//char *loc = 0;
-	//loc = malloc(64000);
+	char *loc = 0;
+	loc = malloc(75000);
 
-	//if(!loc)
-		//printf(1, "Malloc failed!!\n");
+	if(!loc)
+		printf(1, "Malloc failed!!\n");
 
 	ExResetTransferCount();
 
-	ExFileRead("BabyTux.bmp", 0);	//last argument shoudl be loc
+	ExFileRead("test.txt", loc);	//last argument shoudl be loc
 
 	printf(1, "Passed ExFile Read!!\n");
 
-	ExReadSector(0, 0, 0);
+	ExReadSector();
 
-	printf(1, "Passed ExReadSector!!\n");
+	printf(1, "Passed ExReadSector!!\nTransfers: %d\n", ExGetTransferCount());
+
+//	int i = 0;
+//	for(; i < 71680; i++)
+//	{
+//		printf(1, "%s", loc);
+//	}
 
 //	uint prevCount = 0;
 //	prevCount = ExGetTransferCount();

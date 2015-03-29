@@ -281,8 +281,9 @@ ilock(struct inode *ip)
   release(&icache.lock);
 
   if(!(ip->flags & I_VALID)){
-    bp = bread(ip->dev, IBLOCK(ip->inum));
+	bp = bread(ip->dev, IBLOCK(ip->inum));
     dip = (struct dinode*)bp->data + ip->inum%IPB;
+ //   cprintf("\n=================dip: %x===============\n", dip);
     ip->type = dip->type;
     ip->major = dip->major;
     ip->minor = dip->minor;
@@ -356,7 +357,7 @@ iunlockput(struct inode *ip)
 
 // Return the disk block address of the nth block in inode ip.
 // If there is no such block, bmap allocates one.
-static uint
+uint
 bmap(struct inode *ip, uint bn)
 {
   uint addr, *a;
@@ -481,6 +482,7 @@ readi(struct inode *ip, char *dst, uint off, uint n)
   for(tot=0; tot<n; tot+=m, off+=m, dst+=m){
     bp = bread(ip->dev, bmap(ip, off/BSIZE));
     m = min(n - tot, BSIZE - off%BSIZE);
+    //cprintf("M is: %d\n", m);
     memmove(dst, bp->data + off%BSIZE, m);
     brelse(bp);
   }

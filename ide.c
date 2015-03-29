@@ -83,6 +83,7 @@ idestart(struct buf *b)
     outb(0x1f7, IDE_CMD_WRITE);
     outsl(0x1f0, b->data, 512/4);
   } else {
+	  //cprintf("\n=================Sector: %d=================\n", b->sector);
     outb(0x1f7, IDE_CMD_READ);
   }
 }

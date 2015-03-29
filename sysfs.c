@@ -18,6 +18,8 @@
 
 typedef void (*function_ptr)(void);
 
+#define min(a, b) ((a) < (b) ? (a) : (b))
+
 void SetDMA()
 {
 #define ENABLE_DMA
@@ -68,29 +70,46 @@ sys_ExFileRead(void)
 
 	ilock(ip);
 
-	//cprintf("Device: %d, Size: %d, INum: %d: \n", ip->dev, ip->size, ip->inum);
+	cprintf("Device: %d, Size: %d, INum: %d: \n", ip->dev, ip->size, ip->inum);
 	//cprintf("sys_ExFileRead Cpu: %d\n", cpu->id);
 
-	uint add = PGROUNDDOWN((uint)proc->sz);
-	mappages(proc->pgdir, (void*)add, 75000, FOURMEG, PTE_U | PTE_W | PTE_P);
+	//uint add = PGROUNDDOWN((uint)proc->sz);
+	//mappages(proc->pgdir, (void*)add, 75000, FOURMEG, PTE_U | PTE_W | PTE_P);
 
 	int offset = 0;
 
-	location = (char*)add;
+	//uint n = ip->size, tot = 0, m = 0;
+
+	//location = (char*)add;
+
+//	 for(tot=0; tot<n; tot += m, offset += m, location += m)
+//	 {
+//		 ex_addbuffer(ex_bmap(ip, offset / BSIZE), ip->dev, location);
+//		 m = min(n - tot, BSIZE - offset %BSIZE);
+//	  }
+
+	//iunlock(ip);
 
 	while(offset < ip->size)
 	{
-		ex_addbuffer(ex_bmap(ip, offset / BSIZE), ip->dev, location);
+		//ilock(ip);
+		ex_addbuffer(bmap(ip, offset / BSIZE), ip->dev, location);
 		offset += 512;
-		//cprintf("Location move\n");
-		//location = &location[512];
 		location += 512;
-		//cprintf("Location: %x\n", location);
+		//iunlock(ip);
 	}
+
+	location -= 512;
+	offset -= 512;
+	location += ip->size - offset;
+	offset += ip->size - offset;
+
+	ex_addbuffer(bmap(ip, offset / BSIZE), ip->dev, location);
+
 
 	iunlock(ip);
 
-	return 0;
+	return ip->size;
 }
 
 int sys_ExReadSector(void)
