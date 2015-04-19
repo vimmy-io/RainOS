@@ -1,12 +1,15 @@
 #include "types.h"
 #include "stat.h"
-#include "user.h"
+//#include "user.h"
+#include "libos.h"
 #include "mmu.h"
 #include "elf.h"
 
 //#include "ex_fs.h"
 
 #define PHYADDR(va, pte)	(((uint)(va) & 0xFFF) & ((uint)(pte) & ~0xFFF))
+
+#define SET_NUM	100
 
 void VATest()
 {
@@ -193,15 +196,38 @@ main(int argc, char *argv[])
 
 	ExResetTransferCount();
 
+	int time = 0;
+
+	time = uptime();
+
 	ExFileRead("BabyTux.bmp", loc);	//last argument shoudl be loc
 
-	printf(1, "Passed ExFile Read!!\n");
+	//printf(1, "Passed ExFile Read!!\n");
 
 	ExReadSector();
 
-	printf(1, "Passed ExReadSector!!\nTransfers: %d\n", ExGetTransferCount());
+	//.printf(1, "Passed ExReadSector!!\nTransfers: %d\n", ExGetTransferCount());
 
 	load_bmp(loc);
+	time = uptime() - time;
+
+	printf(1, "Time taken: %d\n", time);
+
+	int i = 0;
+	for(; i < SET_NUM; i++)
+	{
+		time = uptime();
+
+		ExFileRead("BabyTux.bmp", loc);
+		ExReadSector();
+		load_bmp(loc);
+
+		time = uptime() - time;
+
+		printf(1, "%d\n", time);
+	}
+
+	//load_bmp(FileTransfer("BabyTux.bmp", 75000));
 
   exit();
 }
@@ -253,12 +279,12 @@ void load_bmp(char *file)
   BITMAP b;
 
   ReadSize((void*)&b.width, &fp, sizeof(b.width));
-  printf(1, "Width: %d\n", b.width);
+  	  //printf(1, "Width: %d\n", b.width);
 
   fp.pointer += 2;
 
   ReadSize((void*)&b.height, &fp, sizeof(b.height));
-  printf(1, "Height: %d\n", b.height);
+  	  //printf(1, "Height: %d\n", b.height);
 
   fp.pointer += 22;
 
@@ -291,60 +317,4 @@ void load_bmp(char *file)
     for( x = 0; x < b.width; x++)
       b.data[(ushort)index + x] =(uchar)ReadF(&fp);
 }
-
-//void load_bmp(char *file,BITMAP *b)
-//{
-//  FILE *fp;
-//  long index;
-//  word num_colors;
-//  int x;
-//
-//  /* open the file */
-//  if ((fp = fopen(file,"rb")) == NULL)
-//  {
-//    printf("Error opening file %s.\n",file);
-//    exit(1);
-//  }
-//
-//  /* check to see if it is a valid bitmap file */
-//  if (fgetc(fp)!='B' || fgetc(fp)!='M')
-//  {
-//    fclose(fp);
-//    printf("%s is not a bitmap file.\n",file);
-//    exit(1);
-//  }
-//
-//  /* read in the width and height of the image, and the
-//     number of colors used; ignore the rest */
-//  fskip(fp,16);
-//  fread(&b->width, sizeof(word), 1, fp);
-//  fskip(fp,2);
-//  fread(&b->height,sizeof(word), 1, fp);
-//  fskip(fp,22);
-//  fread(&num_colors,sizeof(word), 1, fp);
-//  fskip(fp,6);
-//
-//  /* assume we are working with an 8-bit file */
-//  if (num_colors==0) num_colors=256;
-//
-//
-//  /* try to allocate memory */
-//  if ((b->data = (byte *) malloc((word)(b->width*b->height))) == NULL)
-//  {
-//    fclose(fp);
-//    printf("Error allocating memory for file %s.\n",file);
-//    exit(1);
-//  }
-//
-//  /* Ignore the palette information for now.
-//     See palette.c for code to read the palette info. */
-//  fskip(fp,num_colors*4);
-//
-//  /* read the bitmap */
-//  for(index=(b->height-1)*b->width;index>=0;index-=b->width)
-//    for(x=0;x<b->width;x++)
-//      b->data[(word)index+x]=(byte)fgetc(fp);
-//
-//  fclose(fp);
-//}
 

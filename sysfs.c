@@ -70,7 +70,7 @@ sys_ExFileRead(void)
 
 	ilock(ip);
 
-	cprintf("Device: %d, Size: %d, INum: %d: \n", ip->dev, ip->size, ip->inum);
+	//cprintf("Device: %d, Size: %d, INum: %d: \n", ip->dev, ip->size, ip->inum);
 	//cprintf("sys_ExFileRead Cpu: %d\n", cpu->id);
 
 	//uint add = PGROUNDDOWN((uint)proc->sz);
