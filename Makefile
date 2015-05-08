@@ -178,6 +178,8 @@ UPROGS=\
 	BabyTux.bmp\
 	_app_ex_file\
 	_app_mono_file\
+	_app_ex_mem\
+	_app_mono_mem\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)

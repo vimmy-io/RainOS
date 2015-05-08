@@ -30,18 +30,11 @@ sys_ExGetFrame(void)
 
 	r = getfreelist();
 
-	//cprintf("kmem is: %x\n", r);
-	//cprintf("Num Wanted: %d\n", num_frames);
-
-	//cprintf("Start Count: %d\n", num);
-
 	while(r != 0 && num < num_frames)
 	{
 		r = r->next;
-		num++;	//num++ not working
+		num++;
 	}
-
-	//cprintf("Num Found: %d\n", num);
 
 	if(num != num_frames)
 		return 0;

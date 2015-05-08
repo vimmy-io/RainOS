@@ -86,9 +86,7 @@ ideread(uint sector, uint device)
 	outb(0x1f6, 0xe0 | ((device&1)<<4) | ((sector>>24)&0x0f));
 	outb(0x1f7, IDE_CMD_READ);
 
-	idewait(1);
-
-	//cprintf("ide read end\n");	//this line needs to be here and I DON'T KNOW WHYYYY
+	idewait(1); //this line needs to be here and I DON'T KNOW WHYYYY
 }
 
 void ProcessBuffer()
@@ -97,7 +95,6 @@ void ProcessBuffer()
 		return;
 
 	ideread(idequeue->sector, idequeue->device);
-	//cprintf("After ide Read\n");
 }
 
 void
@@ -106,26 +103,17 @@ ex_addbuffer(uint sector, uint device, char *location)
 	struct buffer *temp;
 	temp = (struct buffer*)location;
 
-	//cprintf("Location: %x\n", location);
-
 	temp->device = device;
 	temp->sector = sector;
 	temp->location = location;
 	temp->next = 0;
 
-	//cprintf("\n=================Sector: %d=================\n", sector);
-
 	acquire(&bufferlock);
-
-	//cprintf("Add Buffer\n");
 
 	if(idequeue == 0)
 	{
 		idequeue = temp;
 		last = temp;
-
-		//start reading
-		//ProcessBuffer();
 
 	}
 	else
@@ -142,8 +130,6 @@ ex_addbuffer(uint sector, uint device, char *location)
 void
 ex_ideintr(void)
 {
-	//cprintf("ex_ideintr Cpu: %d\n", cpu->id);
-
 	char *location = 0;
 	// First queued buffer is the active request.
 	acquire(&bufferlock);
@@ -154,8 +140,6 @@ ex_ideintr(void)
 
 	if(idequeue == 0)
 		last = 0;
-
-	//cprintf("Location: %x\n", location);
 
 	// Read data if needed.
 	if(idewait(1) >= 0)
@@ -168,12 +152,6 @@ ex_ideintr(void)
 	}
 
 	release(&bufferlock);
-
-//	int i = 0;
-//	for(; i < 512; i++)
-//	{
-//		consputc(location[i]);
-//	}
 
 	ProcessBuffer();
 }

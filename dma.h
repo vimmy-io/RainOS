@@ -8,18 +8,10 @@
 #ifndef _ASM_X86_DMA_H
 #define _ASM_X86_DMA_H
 
-//#include <linux/spinlock.h>	/* And spinlocks */
-//#include <asm/io.h>		/* need byte IO */
-
 //MY CUSTOM INCLUDES
 #include "types.h"
 
-//#ifdef HAVE_REALLY_SLOW_DMA_CONTROLLER
-//#define dma_outb	outb_p
-//#else
 #define dma_outb	outb
-//#endif
-
 #define dma_inb		inb
 
 /* Basic port I/O */
